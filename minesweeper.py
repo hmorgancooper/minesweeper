@@ -123,19 +123,27 @@ class Sentence():
         """
         # cell is a known mine from list of mines from MinesweeperAI.mines
         # unknown cell is list of cells from Sentence (self.cells)
+        tmp = []
         for unknown_cell in self.cells:
+            tmp.append(unknown_cell)
+        for unknown_cell in tmp:
             if unknown_cell == cell:
                 self.cells.remove(cell)
                 self.count -= 1
+        
 
     def mark_safe(self, cell):
         """
         Updates internal knowledge representation given the fact that
         a cell is known to be safe.
         """
-        for cell in self.cells:
-            if cell in self.known_safes:
+        tmp = []
+        for unknown_cell in self.cells:
+            tmp.append(unknown_cell)
+        for unknown_cell in tmp:
+            if unknown_cell == cell:
                 self.cells.remove(cell)
+        
 
 class MinesweeperAI():
     """
@@ -192,20 +200,20 @@ class MinesweeperAI():
                if they can be inferred from existing knowledge
         """
         # 1. mark the cell as a move that has been made
-        self.moves_made.append(cell)
+        self.moves_made.add(cell)
         # 2. mark the cell as safe
-        self.safes.append(cell)
+        self.safes.add(cell)
         # 3. Add new sentence to AI's knowledge base
         # get list of adjacent cells
         adj_cells = []
-        for i in range(-1,1,1):
-            for j in range(-1,1,1):
-                if (i in range(self.height) and j in range(self.width)) and (i != 0 and j!=0):
-                    print(i, j)
-                    adj_cells.append((i,j))
+        for a in range(-1,2,1):
+            for b in range(-1,2,1):
+                if ((cell[0]+a) in range(self.height) and (cell[1]+b) in range(self.width)) and (a != 0 or b!=0):
+                    adj_cells.append((cell[0]+a, cell[1]+b))
+        #print(adj_cells)
         # Create sentence based on info
         new_knowledge = Sentence(adj_cells, count)
-        self.knowledge.add(new_knowledge)
+        self.knowledge.append(new_knowledge)
         # 4. Mark additional cells as safe or mines
         # Remove known mines from list
         for mine in self.mines:

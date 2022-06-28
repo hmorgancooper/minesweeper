@@ -29,5 +29,20 @@ def test_add_knowlegde_safe_cell():
    ai.add_knowledge((0,0), 1)
    assert(ai.safes == {(0,0)})
 
+def test_add_knowledge_1():
+   ai = MinesweeperAI()
+   ai.add_knowledge((7,7), 1)
+   assert(ai.knowledge[0] == Sentence([(6, 6), (6, 7), (7, 6)], 1))
 
+def test_add_knowledge_removing_mines():
+   ai = MinesweeperAI()
+   ai.mines.add((6,6))
+   ai.add_knowledge((7,7), 1)
+   assert(ai.knowledge[0] == Sentence([(6, 7), (7, 6)], 0))
+
+def test_add_knowledge_removing_safes():
+   ai = MinesweeperAI()
+   ai.safes.add((6,6))
+   ai.add_knowledge((7,7), 1)
+   assert(ai.knowledge[0] == Sentence([(6, 7), (7, 6)], 1))
    
