@@ -1,5 +1,6 @@
 import itertools
 import random
+#from typing_extensions import clear_overloads
 
 
 class Minesweeper():
@@ -105,28 +106,36 @@ class Sentence():
         """
         Returns the set of all cells in self.cells known to be mines.
         """
-        raise NotImplementedError
+        if len(self.cells) == self.count:
+            return self.cells
 
     def known_safes(self):
         """
         Returns the set of all cells in self.cells known to be safe.
         """
-        raise NotImplementedError
+        if self.count == 0:
+            return self.cells
 
     def mark_mine(self, cell):
         """
         Updates internal knowledge representation given the fact that
         a cell is known to be a mine.
         """
-        raise NotImplementedError
+        # cell is a known mine from list of mines from MinesweeperAI.mines
+        # unknown cell is list of cells from Sentence (self.cells)
+        for unknown_cell in self.cells:
+            if unknown_cell == cell:
+                self.cells.remove(cell)
+                self.count -= 1
 
     def mark_safe(self, cell):
         """
         Updates internal knowledge representation given the fact that
         a cell is known to be safe.
         """
-        raise NotImplementedError
-
+        for cell in self.cells:
+            if cell in self.known_safes:
+                self.cells.remove(cell)
 
 class MinesweeperAI():
     """
@@ -182,7 +191,32 @@ class MinesweeperAI():
             5) add any new sentences to the AI's knowledge base
                if they can be inferred from existing knowledge
         """
-        raise NotImplementedError
+        # 1. mark the cell as a move that has been made
+        self.moves_made.append(cell)
+        # 2. mark the cell as safe
+        self.safes.append(cell)
+        # 3. Add new sentence to AI's knowledge base
+        # get list of adjacent cells
+        adj_cells = []
+        for i in range(-1,1,1):
+            for j in range(-1,1,1):
+                if (i in range(self.height) and j in range(self.width)) and (i != 0 and j!=0):
+                    print(i, j)
+                    adj_cells.append((i,j))
+        # Create sentence based on info
+        new_knowledge = Sentence(adj_cells, count)
+        self.knowledge.add(new_knowledge)
+        # 4. Mark additional cells as safe or mines
+        # Remove known mines from list
+        for mine in self.mines:
+            new_knowledge.mark_mine(mine)
+        # Remove known safes from list
+        for safe in self.safes:
+            new_knowledge.mark_safe(safe)
+        # Add new knowlegde to list of knowledge
+        self.knowledge.append(new_knowledge)
+        
+        
 
     def make_safe_move(self):
         """
