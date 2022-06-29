@@ -223,6 +223,22 @@ class MinesweeperAI():
             new_knowledge.mark_safe(safe)
         # Add new knowlegde to list of knowledge
         self.knowledge.append(new_knowledge)
+        # 5. Add new sentences to AI knowledge base if they can be inferred
+
+        # for sentence in knowledge run Sentence.known_safes and Sentence.known_mines
+        # if not null add to safes/mines
+        # update all sentences with known safes/ mines
+        if new_knowledge.known_safes():
+            for cell in new_knowledge.known_safes():
+                self.safes.add(cell)
+        if new_knowledge.known_mines():
+            for cell in new_knowledge.known_mines():
+                self.mines.add(cell)
+
+        # Compare each sentence to every other sentence
+        # if counts are same and length of matching cells = count --> mark as mines
+
+        #...
         
         
 
