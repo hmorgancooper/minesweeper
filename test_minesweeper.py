@@ -37,8 +37,8 @@ def test_add_knowledge_1():
 def test_add_knowledge_removing_mines():
    ai = MinesweeperAI()
    ai.mines.add((6,6))
-   ai.add_knowledge((7,7), 1)
-   assert(ai.knowledge[0] == Sentence([(6, 7), (7, 6)], 0))
+   ai.add_knowledge((7,7), 2)
+   assert(ai.knowledge[0] == Sentence([(6, 7), (7, 6)], 1))
 
 def test_add_knowledge_removing_safes():
    ai = MinesweeperAI()

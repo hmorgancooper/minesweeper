@@ -202,7 +202,7 @@ class MinesweeperAI():
         # 1. mark the cell as a move that has been made
         self.moves_made.add(cell)
         # 2. mark the cell as safe
-        self.safes.add(cell)
+        self.mark_safe(cell)
         # 3. Add new sentence to AI's knowledge base
         # get list of adjacent cells
         adj_cells = []
@@ -221,6 +221,16 @@ class MinesweeperAI():
         # Remove known safes from list
         for safe in self.safes:
             new_knowledge.mark_safe(safe)
+        
+        if new_knowledge.known_safes():
+            tmp = new_knowledge.known_safes().copy()
+            for cell in tmp:
+                self.mark_safe(cell)
+        if new_knowledge.known_mines():
+            tmp = new_knowledge.known_mines().copy()
+            for cell in tmp:
+                self.mark_mine(cell)
+
         # Add new knowlegde to list of knowledge
         self.knowledge.append(new_knowledge)
         # 5. Add new sentences to AI knowledge base if they can be inferred
@@ -228,17 +238,13 @@ class MinesweeperAI():
         # for sentence in knowledge run Sentence.known_safes and Sentence.known_mines
         # if not null add to safes/mines
         # update all sentences with known safes/ mines
-        if new_knowledge.known_safes():
-            for cell in new_knowledge.known_safes():
-                self.safes.add(cell)
-        if new_knowledge.known_mines():
-            for cell in new_knowledge.known_mines():
-                self.mines.add(cell)
+        
 
         # Compare each sentence to every other sentence
         # if counts are same and length of matching cells = count --> mark as mines
 
-        #...
+        #...run known_safes and known_mines on all updated sentences
+        # cycle through updating until no new changes
         
         
 
