@@ -63,3 +63,9 @@ def test_count_is_len_cells_sets_all_to_mines():
    ai = MinesweeperAI()
    ai.add_knowledge((6,6), 8)
    assert(ai.mines == {(5, 5), (6, 5), (5, 7), (6, 7), (7, 6), (5, 6), (7, 5), (7,7)})
+
+def test_add_knowledge_removing_mines_retrospectively():
+   ai = MinesweeperAI()
+   ai.add_knowledge((7,7), 2)
+   ai.mines.mark_safe((6,6))
+   assert(ai.knowledge[0] == Sentence([(6, 7), (7, 6)], 1))
