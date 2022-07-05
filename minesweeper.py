@@ -213,7 +213,7 @@ class MinesweeperAI():
         # Add new sentences to AI knowledge base if they can be inferred
         changes = 1
         while (changes > 0):
-            changes += self.compare_all_sentences_for_matching_sets()
+            changes += self.find_subsets_and_create_new_sentences()
             changes = self.check_all_sentences_for_known_safes_and_mines()
             
             
@@ -244,7 +244,7 @@ class MinesweeperAI():
         self.knowledge.append(new_knowledge)
         
 
-    def compare_all_sentences_for_matching_sets(self):
+    def find_subsets_and_create_new_sentences(self):
         changes = 0
         for i in range(0, len(self.knowledge)):
             for j in range(0, len(self.knowledge)):
