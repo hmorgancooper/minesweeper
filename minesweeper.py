@@ -199,52 +199,91 @@ class MinesweeperAI():
             5) add any new sentences to the AI's knowledge base
                if they can be inferred from existing knowledge
         """
-        # 1. mark the cell as a move that has been made
+        # mark the cell as a move that has been made
         self.moves_made.add(cell)
-        # 2. mark the cell as safe
+        # mark the cell as safe
         self.mark_safe(cell)
-        # 3. Add new sentence to AI's knowledge base
-        # get list of adjacent cells
         adj_cells = []
         for a in range(-1,2,1):
             for b in range(-1,2,1):
                 if ((cell[0]+a) in range(self.height) and (cell[1]+b) in range(self.width)) and (a != 0 or b!=0):
                     adj_cells.append((cell[0]+a, cell[1]+b))
-        #print(adj_cells)
-        # Create sentence based on info
+        self.generate_new_knowledge_sentence(adj_cells, count)
+
+        # Add new sentences to AI knowledge base if they can be inferred
+        changes = 1
+        while (changes > 0):
+            changes += self.compare_all_sentences_for_matching_sets()
+            changes = self.check_all_sentences_for_known_safes_and_mines()
+            
+            
+        
+        # Compare each sentence to every other sentence
+        # if counts are same and length of matching cells = count --> mark matching as mines, not matching as safes
+    
+
+    def generate_new_knowledge_sentence(self, adj_cells, count):
         new_knowledge = Sentence(adj_cells, count)
-        self.knowledge.append(new_knowledge)
-        # 4. Mark additional cells as safe or mines
-        # Remove known mines from list
+        # Mark additional cells as safe or mines
         for mine in self.mines:
             new_knowledge.mark_mine(mine)
-        # Remove known safes from list
         for safe in self.safes:
             new_knowledge.mark_safe(safe)
         
+        # check if mines or safes can be found from sentence
         if new_knowledge.known_safes():
             tmp = new_knowledge.known_safes().copy()
             for cell in tmp:
                 self.mark_safe(cell)
+            return
         if new_knowledge.known_mines():
             tmp = new_knowledge.known_mines().copy()
             for cell in tmp:
                 self.mark_mine(cell)
-
-        # Add new knowlegde to list of knowledge
+            return
         self.knowledge.append(new_knowledge)
-        # 5. Add new sentences to AI knowledge base if they can be inferred
-
-        # for sentence in knowledge run Sentence.known_safes and Sentence.known_mines
-        # if not null add to safes/mines
-        # update all sentences with known safes/ mines
         
 
-        # Compare each sentence to every other sentence
-        # if counts are same and length of matching cells = count --> mark as mines
+    def compare_all_sentences_for_matching_sets(self):
+        changes = 0
+        for i in range(0, len(self.knowledge)):
+            for j in range(0, len(self.knowledge)):
+                if (i != j):
+                    # find matching set
+                    matching = self.knowledge[i].cells.intersection(self.knowledge[j].cells).copy()
+                    if matching.issubset(self.knowledge[i].cells):
+                        not_matching = (self.knowledge[i].cells - self.knowledge[j].cells).copy()
+                        if not_matching:
+                            changes += 1
+                            new_count = abs(self.knowledge[i].count - self.knowledge[j].count)
+                            self.generate_new_knowledge_sentence(not_matching, new_count)                        
+        return changes
+     
 
-        #...run known_safes and known_mines on all updated sentences
-        # cycle through updating until no new changes
+    def check_all_sentences_for_known_safes_and_mines(self):
+        ''' 
+        for sentence in knowledge run Sentence.known_safes and Sentence.known_mines
+        if not null add to safes/mines
+        update all sentences with known safes/ mines
+        '''
+        changes = 0
+        for sentence in self.knowledge:
+                if sentence.known_safes():
+                    changes += 1
+                    tmp = sentence.known_safes().copy()
+                    for cell in tmp:
+                        self.mark_safe(cell)
+                if sentence.known_mines():
+                    changes += 1
+                    tmp = sentence.known_mines().copy()
+                    for cell in tmp:
+                        self.mark_mine(cell)
+        return changes
+                        
+
+
+            
+
         
         
 

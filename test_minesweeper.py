@@ -67,5 +67,22 @@ def test_count_is_len_cells_sets_all_to_mines():
 def test_add_knowledge_removing_mines_retrospectively():
    ai = MinesweeperAI()
    ai.add_knowledge((7,7), 2)
-   ai.mines.mark_safe((6,6))
+   ai.mark_mine((6,6))
    assert(ai.knowledge[0] == Sentence([(6, 7), (7, 6)], 1))
+
+def test_add_knowledge_updates_knowledge():
+   ai = MinesweeperAI()
+   ai.add_knowledge((6,6), 3)
+   ai.add_knowledge((7,7), 2)
+   assert(ai.knowledge[0] == Sentence([(5, 5), (6, 5), (5, 7), (5, 6), (7, 5)], 1))
+
+def test_overlapping_cells_create_new_knowledge():
+   ai = MinesweeperAI()
+   ai.add_knowledge((6,6), 3)
+   ai.add_knowledge((7,7), 1)
+   assert(ai.knowledge[2] == Sentence([(5, 5), (6, 5), (5, 7), (5, 6), (7, 5)], 2))
+
+# test that no matching cells does not create new knowledge
+# test that add knowledge cycles through until no more changes to knowledge
+
+
