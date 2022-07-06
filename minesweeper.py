@@ -213,14 +213,13 @@ class MinesweeperAI():
         # Add new sentences to AI knowledge base if they can be inferred
         changes = 1
         while (changes > 0):
-            changes += self.find_subsets_and_create_new_sentences()
-            changes = self.check_all_sentences_for_known_safes_and_mines()
+            changes = self.update_with_inferred_sentences()
+            
             
             
         
         # Compare each sentence to every other sentence
         # if counts are same and length of matching cells = count --> mark matching as mines, not matching as safes
-    
 
     def generate_new_knowledge_sentence(self, adj_cells, count):
         new_knowledge = Sentence(adj_cells, count)
@@ -241,23 +240,31 @@ class MinesweeperAI():
             for cell in tmp:
                 self.mark_mine(cell)
             return
-        self.knowledge.append(new_knowledge)
+        if new_knowledge not in self.knowledge:
+            self.knowledge.append(new_knowledge)
+        
+    
+
+    def update_with_inferred_sentences(self):
+        changes = self.check_all_sentences_for_known_safes_and_mines()
+        changes += self.find_subsets_and_create_new_sentences() 
+        return changes
         
 
     def find_subsets_and_create_new_sentences(self):
-        changes = 0
+        original = len(self.knowledge)
         for i in range(0, len(self.knowledge)):
             for j in range(0, len(self.knowledge)):
                 if (i != j):
                     # find matching set
                     matching = self.knowledge[i].cells.intersection(self.knowledge[j].cells).copy()
-                    if matching.issubset(self.knowledge[i].cells):
+                    if self.knowledge[j].cells.issubset(self.knowledge[i].cells):
                         not_matching = (self.knowledge[i].cells - self.knowledge[j].cells).copy()
                         if not_matching:
-                            changes += 1
                             new_count = abs(self.knowledge[i].count - self.knowledge[j].count)
-                            self.generate_new_knowledge_sentence(not_matching, new_count)                        
-        return changes
+                            self.generate_new_knowledge_sentence(not_matching, new_count)
+        end = len(self.knowledge)                  
+        return original - end
      
 
     def check_all_sentences_for_known_safes_and_mines(self):
